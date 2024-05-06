@@ -1,20 +1,45 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { useContext } from "react";
+import { APP_SCREENS } from "./constants/screens";
+import { AuthContext, AuthProvider } from "./contexts/AuthContext";
+import AuthScreen from "./screens/AuthScreen";
+import LoginScreen from "./screens/LoginScreen";
 
-export default function App() {
+const Stack = createNativeStackNavigator();
+
+function AppRouter() {
+  const { user } = useContext(AuthContext);
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator>
+        {!user.isAuth ? (
+          <Stack.Screen
+            name={APP_SCREENS.LOGIN}
+            component={LoginScreen}
+            options={{
+              title: "Ecommerce App",
+              headerShown: false,
+            }}
+          />
+        ) : (
+          <Stack.Screen
+            name={APP_SCREENS.AUTH}
+            component={AuthScreen}
+            options={{
+              headerShown: false,
+            }}
+          />
+        )}
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppRouter />
+    </AuthProvider>
+  );
+}
