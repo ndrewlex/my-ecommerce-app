@@ -1,18 +1,35 @@
 import { useNavigation } from "@react-navigation/native";
-import { useContext, useState } from "react";
-import { Button, StyleSheet, Text, TextInput, View } from "react-native";
+import { useState } from "react";
+import {
+  Button,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { APP_SCREENS } from "../constants/screens";
-import { AuthContext } from "../contexts/AuthContext";
+import { registerUser } from "../services/firebase/auth";
 
 const initialForm = {
   email: "",
   password: "",
+  firstName: "",
+  lastName: "",
 };
-export default function LoginScreen() {
-  const { login } = useContext(AuthContext);
+export default function SignupScreen() {
   const navigation = useNavigation();
   const [formValue, setFormValue] = useState(initialForm);
+
+  const handleChangeFirstName = (text) => {
+    setFormValue((curr) => ({ ...curr, firstName: text }));
+  };
+
+  const handleChangeLastName = (text) => {
+    setFormValue((curr) => ({ ...curr, lastName: text }));
+  };
+
   const handleChangeEmail = (text) => {
     setFormValue((curr) => ({ ...curr, email: text }));
   };
@@ -20,20 +37,32 @@ export default function LoginScreen() {
     setFormValue((curr) => ({ ...curr, password: text }));
   };
 
-  const handleLogin = async () => {
-    if (await login(formValue)) {
-      navigation.navigate(APP_SCREENS.AUTH);
+  const handleSignup = async () => {
+    const res = await registerUser(formValue);
+    if (res.isSuccess) {
+      navigation.navigate(APP_SCREENS.LOGIN);
       setFormValue(initialForm);
     }
   };
 
-  const goToSignUp = () => {
-    navigation.navigate(APP_SCREENS.SIGN_UP);
-  };
-
   return (
     <SafeAreaView style={styles.container}>
+      <TouchableOpacity onPress={() => navigation.goBack()}>
+        <Text>Back</Text>
+      </TouchableOpacity>
       <Text style={styles.logo}>Ecommerce</Text>
+      <TextInput
+        style={styles.input}
+        onChangeText={handleChangeFirstName}
+        value={formValue.firstName}
+        placeholder="Enter first name"
+      />
+      <TextInput
+        style={styles.input}
+        onChangeText={handleChangeLastName}
+        value={formValue.lastName}
+        placeholder="Enter last name"
+      />
       <TextInput
         style={styles.input}
         onChangeText={handleChangeEmail}
@@ -48,9 +77,8 @@ export default function LoginScreen() {
         textContentType="password"
         secureTextEntry={true}
       />
-      <View style={styles.actionButton}>
-        <Button title="Login" onPress={handleLogin} />
-        <Button title="Sign up" onPress={goToSignUp} />
+      <View style={styles.signupButton}>
+        <Button title="Sign up" onPress={handleSignup} />
       </View>
     </SafeAreaView>
   );
@@ -75,8 +103,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 8,
   },
-  actionButton: {
-    gap: 10,
-    marginVertical: 10,
+  signupButton: {
+    marginVertical: 20,
   },
 });

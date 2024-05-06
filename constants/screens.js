@@ -1,5 +1,6 @@
 export const APP_SCREENS = {
   LOGIN: "LOGIN",
+  SIGN_UP: "SIGN_UP",
   AUTH: "AUTH",
   AUTH_TAB: "AUTH_TAB",
   HOME: "HOME",

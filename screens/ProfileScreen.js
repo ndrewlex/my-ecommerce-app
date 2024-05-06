@@ -10,8 +10,7 @@ export default function ProfileScreen() {
   const { logout, user } = useContext(AuthContext);
 
   const handleLogout = async () => {
-    const res = await logout();
-    if (res.isSuccess) {
+    if (await logout()) {
       navigation.navigate(APP_SCREENS.LOGIN);
     }
   };

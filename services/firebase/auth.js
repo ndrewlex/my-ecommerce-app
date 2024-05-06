@@ -4,12 +4,12 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { getErrorMessage } from "./errorMessage";
 import { db } from "./firestore";
 import { firebaseApp } from "./initFirebase";
 
-async function registerUser({ email, password }) {
+async function registerUser({ email, firstName, lastName, password }) {
   try {
     const auth = getAuth(firebaseApp);
     const userCredential = await createUserWithEmailAndPassword(
@@ -17,7 +17,9 @@ async function registerUser({ email, password }) {
       email,
       password
     );
-    await setDoc(doc(db, "company", userCredential.user.uid), {
+    await setDoc(doc(db, "customer", userCredential.user.uid), {
+      firstName,
+      lastName,
       email,
     });
 
@@ -66,4 +68,25 @@ async function logoutUser() {
   }
 }
 
-export { loginUser, logoutUser, registerUser };
+async function getCustomerById(uid) {
+  try {
+    const docRef = doc(db, "customer", uid);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      return {
+        isSuccess: true,
+        data: docSnap.data(),
+      };
+    } else {
+      throw new Error("Not exist");
+    }
+  } catch (e) {
+    return {
+      isSuccess: false,
+      error: getErrorMessage(e),
+    };
+  }
+}
+
+export { getCustomerById, loginUser, logoutUser, registerUser };
