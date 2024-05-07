@@ -6,6 +6,7 @@ import { AuthContext, AuthProvider } from "./contexts/AuthContext";
 import AuthScreen from "./screens/AuthScreen";
 import LoginScreen from "./screens/LoginScreen";
 import SignupScreen from "./screens/SignupScreen";
+import { color } from "./styles/color";
 
 const Stack = createNativeStackNavigator();
 
@@ -14,7 +15,9 @@ function AppRouter() {
   return (
     <NavigationContainer>
       {!user.isAuth ? (
-        <Stack.Navigator>
+        <Stack.Navigator
+          screenOptions={{ contentStyle: { backgroundColor: color.white } }}
+        >
           <Stack.Screen
             name={APP_SCREENS.LOGIN}
             component={LoginScreen}

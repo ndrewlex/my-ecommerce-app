@@ -1,6 +1,7 @@
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
-import { FlatList, View } from "react-native";
+import { FlatList, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import ProductCard from "../components/ProductCard";
 import { APP_SCREENS } from "../constants/screens";
 import getProducts from "../services/products";
@@ -23,15 +24,27 @@ export default function HomeScreen() {
   };
 
   return (
-    <View>
+    <SafeAreaView style={styles.container}>
       <FlatList
         data={products}
         numColumns={2}
+        style={styles.productList}
         renderItem={({ item }) => (
           <ProductCard item={item} handleProductClick={handleProductDetails} />
         )}
+        keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
       />
-    </View>
+    </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  productList: {
+    marginVertical: 15,
+    marginHorizontal: 5,
+  },
+});

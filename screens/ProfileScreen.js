@@ -1,7 +1,9 @@
 import { useNavigation } from "@react-navigation/native";
 import { useContext } from "react";
-import { Button, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Button from "../components/Button";
+import HeaderNav from "../components/HeaderNav";
 import { APP_SCREENS } from "../constants/screens";
 import { AuthContext } from "../contexts/AuthContext";
 
@@ -16,12 +18,24 @@ export default function ProfileScreen() {
   };
 
   return (
-    <SafeAreaView>
-      <Text>My Profile</Text>
-      <View>
-        <Text>Hi, {user.email}</Text>
+    <SafeAreaView style={styles.container}>
+      <HeaderNav title="Profile" />
+      <View style={styles.content}>
+        <Text>My Profile</Text>
+        <View>
+          <Text>Hi, {user.email}</Text>
+        </View>
+        <Button title="Logout" onPress={handleLogout} />
       </View>
-      <Button title="Logout" onPress={handleLogout} />
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  content: {
+    padding: 10,
+  },
+});

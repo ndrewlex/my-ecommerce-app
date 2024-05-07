@@ -1,12 +1,14 @@
-import { useNavigation } from "@react-navigation/native";
 import React, { useContext } from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Button from "../components/Button";
+import CartQuantity from "../components/CartQuantity";
+import HeaderNav from "../components/HeaderNav";
 import { CartContext } from "../contexts/CartContext";
+import { color } from "../styles/color";
 
 export default function ProductDetailsScreen({ route }) {
   const { addCartItem, deleteCartItem, cart } = useContext(CartContext);
-  const navigation = useNavigation();
   const product = route.params.item;
 
   const selectedProduct = cart.find((i) => i.id === product.id);
@@ -21,46 +23,31 @@ export default function ProductDetailsScreen({ route }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* <View style={styles.container}> */}
-      <View style={styles.imageContainer}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.header}>Back</Text>
-        </TouchableOpacity>
-        <Image source={{ uri: product.image }} style={styles.coverImage} />
-      </View>
-      <View style={styles.contentContainer}>
-        {/* text container */}
-        <View style={styles.textContainer}>
-          <Text style={styles.fontText}>{product.title}</Text>
-          <Text style={styles.fontText}>${product.price}</Text>
+      <HeaderNav withBorder={false} />
+      <ScrollView>
+        <View style={styles.imageContainer}>
+          <Image source={{ uri: product.image }} style={styles.image} />
         </View>
-        {/* desc container */}
-        <View style={styles.descContainer}>
-          <Text>{product.description}</Text>
-        </View>
-        {/* cart button */}
 
+        <View style={styles.contentContainer}>
+          <Text style={styles.priceText}>${product.price}</Text>
+          <Text style={styles.titleText}>{product.title}</Text>
+
+          <Text style={styles.titleDesc}>Description</Text>
+          <Text stlye={styles.textDesc}>{product.description}</Text>
+        </View>
+      </ScrollView>
+      <View style={{ padding: 10 }}>
         {selectedProduct?.quantity ? (
-          <View style={styles.cartAction}>
-            <TouchableOpacity style={styles.button} onPress={handleDeleteCart}>
-              <Text style={styles.buttonText}>-</Text>
-            </TouchableOpacity>
-            <View style={styles.button}>
-              <Text>{selectedProduct.quantity}</Text>
-            </View>
-            <TouchableOpacity style={styles.button} onPress={handleAddToCart}>
-              <Text style={styles.buttonText}>+</Text>
-            </TouchableOpacity>
-          </View>
+          <CartQuantity
+            product={selectedProduct}
+            onAddCart={handleAddToCart}
+            onDeleteCart={handleDeleteCart}
+          />
         ) : (
-          <View style={styles.cartAction}>
-            <TouchableOpacity style={styles.button} onPress={handleAddToCart}>
-              <Text style={styles.buttonText}>Add to Cart</Text>
-            </TouchableOpacity>
-          </View>
+          <Button title="Add to cart" onPress={handleAddToCart} />
         )}
       </View>
-      {/* </View> */}
     </SafeAreaView>
   );
 }
@@ -68,55 +55,36 @@ export default function ProductDetailsScreen({ route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  header: {
-    padding: 15,
-    fontSize: 16,
+    backgroundColor: color.white,
   },
   imageContainer: {
     height: 300,
-    width: "100%",
+    backgroundColor: "white",
+    padding: 10,
   },
-  coverImage: {
-    resizeMode: "cover",
+  image: {
+    resizeMode: "contain",
     flex: 1,
   },
   contentContainer: {
-    padding: 20,
+    padding: 10,
+    flex: 1,
+    borderTopColor: color.border,
+    borderTopWidth: 1,
   },
-  textContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  fontText: {
+  priceText: {
     fontSize: 20,
-    fontWeight: "700",
-    color: "#444444",
-    color: "#444444",
+    fontWeight: "bold",
   },
-  cartAction: {
-    flexDirection: "row",
-    flex: 1,
-    marginTop: 20,
-    height: 40,
+  titleText: {
+    fontSize: 18,
   },
-  button: {
-    flex: 1,
-    backgroundColor: "#E96E6E",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 20,
-    height: 40,
+  titleDesc: {
+    fontSize: 18,
+    marginVertical: 10,
+    fontWeight: "bold",
   },
-  buttonText: {
-    color: "#FFFFFF",
-    fontWeight: "700",
-    fontSize: 16,
-    paddingHorizontal: 16,
-  },
-  descContainer: {
-    flexDirection: "row",
-    marginTop: 5,
-    marginBottom: 5,
+  textDesc: {
+    fontSize: 18,
   },
 });

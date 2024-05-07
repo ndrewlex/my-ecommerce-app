@@ -1,71 +1,83 @@
 import { useNavigation } from "@react-navigation/native";
 import { useContext } from "react";
 import {
-  Button,
   Dimensions,
   FlatList,
+  Image,
   StyleSheet,
   Text,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Button from "../components/Button";
+import HeaderNav from "../components/HeaderNav";
 import { APP_SCREENS } from "../constants/screens";
 import { CartContext } from "../contexts/CartContext";
+import { color } from "../styles/color";
 
 export default function CartScreen() {
   const navigation = useNavigation();
-
+  const { subtotal, cart } = useContext(CartContext);
   const handleCheckout = () => {
     navigation.navigate(APP_SCREENS.CHECKOUT);
   };
 
-  const { subtotal, cart } = useContext(CartContext);
   return (
-    <View style={styles.container}>
-      <FlatList
-        style={styles.cartList}
-        data={cart}
-        ItemSeparatorComponent={() => <View style={styles.cartSeparator} />}
-        renderItem={({ item }) => {
-          return (
-            <View style={styles.cartRow} key={item.id}>
-              <View style={styles.cartProduct}>
-                <Text style={styles.title}>
-                  <Text className={styles.quantity}>{item.quantity}</Text> x{" "}
-                  {item.title}
-                </Text>
-              </View>
-            </View>
-          );
-        }}
-      />
+    <SafeAreaView style={styles.container}>
+      <HeaderNav title="Cart" />
 
-      {cart.length > 0 && (
-        <View style={styles.cartFooter}>
-          <View style={styles.subtotal}>
-            <Text style={styles.subtotalText}>Subtotal</Text>
-            <Text>$ {subtotal}</Text>
-          </View>
-          <Button
-            title="Checkout"
-            style={styles.checkoutButton}
-            onPress={handleCheckout}
-          >
-            Checkout
-          </Button>
+      <View style={styles.cartList}>
+        <FlatList
+          data={cart}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => {
+            return (
+              <View style={styles.cartRow} key={item.id}>
+                <View style={styles.cartColImage}>
+                  <Image
+                    source={{ uri: item.image }}
+                    style={styles.productImage}
+                  />
+                </View>
+
+                <View style={styles.cartColInfo}>
+                  <Text style={styles.productTitle}>
+                    <Text className={styles.productQuantity}>
+                      {item.quantity}
+                    </Text>{" "}
+                    x {item.title}
+                  </Text>
+                </View>
+              </View>
+            );
+          }}
+        />
+      </View>
+
+      <View style={styles.cartFooter}>
+        <View style={styles.subtotal}>
+          <Text style={styles.subtotalText}>Subtotal</Text>
+          <Text>$ {subtotal}</Text>
         </View>
-      )}
-    </View>
+        <Button
+          title="Checkout"
+          onPress={handleCheckout}
+          containerStyle={{ flex: 1 }}
+        >
+          Checkout
+        </Button>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    position: "relative",
   },
   cartList: {
-    padding: 15,
-    maxHeight: Dimensions.get("screen").height - 270,
+    height: Dimensions.get("screen").height * 0.63,
+    marginVertical: 10,
   },
   cartSeparator: {
     height: 1,
@@ -73,37 +85,49 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   cartRow: {
+    borderWidth: 1,
+    borderRadius: 5,
+    borderColor: color.border,
     flexDirection: "row",
     alignItems: "flex-start",
-    justifyContent: "space-between",
-    paddingVertical: 20,
-  },
-  cartProduct: {
-    flex: 1,
-    marginRight: 10,
+    marginVertical: 5,
   },
 
-  title: {
+  cartColInfo: {
+    flex: 1,
+    marginRight: 10,
+    borderLeftColor: color.border,
+    borderLeftWidth: 1,
+    height: "100%",
+    padding: 10,
+  },
+
+  cartColImage: {
+    width: "25%",
+    aspectRatio: 1,
+    padding: 10,
+  },
+
+  productImage: {
+    objectFit: "contain",
+    flex: 1,
+  },
+
+  productTitle: {
     fontSize: 16,
   },
-  quantity: {
+
+  productQuantity: {
     fontWeight: "bold",
-  },
-  cartPrice: {
-    fontSize: 14,
   },
 
   cartFooter: {
-    width: "100%",
-    position: "absolute",
-    bottom: 0,
-    padding: 15,
-    backgroundColor: "white",
-    height: 100,
+    borderTopColor: color.border,
+    borderTopWidth: 1,
+    padding: 10,
   },
 
   subtotal: {
-    flex: 1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -114,9 +138,5 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 18,
     marginRight: 10,
-  },
-
-  checkoutButton: {
-    textTransform: "capitalize",
   },
 });

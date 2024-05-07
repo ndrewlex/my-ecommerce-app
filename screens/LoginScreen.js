@@ -1,9 +1,13 @@
 import { useNavigation } from "@react-navigation/native";
 import { useContext, useState } from "react";
-import { Button, StyleSheet, Text, TextInput, View } from "react-native";
+import { StyleSheet, Text, TextInput } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Button from "../components/Button";
 import { APP_SCREENS } from "../constants/screens";
 import { AuthContext } from "../contexts/AuthContext";
+import { color } from "../styles/color";
+import { titleCenterStyle } from "../styles/font";
+import { textInputStyle } from "../styles/textInput";
 
 const initialForm = {
   email: "",
@@ -11,6 +15,7 @@ const initialForm = {
 };
 export default function LoginScreen() {
   const { login } = useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
   const [formValue, setFormValue] = useState(initialForm);
   const handleChangeEmail = (text) => {
@@ -21,10 +26,12 @@ export default function LoginScreen() {
   };
 
   const handleLogin = async () => {
+    setLoading(true);
     if (await login(formValue)) {
-      navigation.navigate(APP_SCREENS.AUTH);
       setFormValue(initialForm);
+      navigation.navigate(APP_SCREENS.AUTH);
     }
+    setLoading(false);
   };
 
   const goToSignUp = () => {
@@ -33,50 +40,52 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.logo}>Ecommerce</Text>
+      <Text style={titleCenterStyle}>Ecommerce</Text>
       <TextInput
-        style={styles.input}
+        style={[textInputStyle.base, styles.input]}
         onChangeText={handleChangeEmail}
         value={formValue.email}
         placeholder="Enter email address"
+        placeholderTextColor={color.secondaryText}
       />
       <TextInput
-        style={styles.input}
+        style={[textInputStyle.base, styles.input]}
         onChangeText={handleChangePassword}
         value={formValue.password}
         placeholder="Enter password"
         textContentType="password"
         secureTextEntry={true}
+        placeholderTextColor={color.secondaryText}
       />
-      <View style={styles.actionButton}>
-        <Button title="Login" onPress={handleLogin} />
-        <Button title="Sign up" onPress={goToSignUp} />
-      </View>
+      <Button
+        title="Sign in"
+        onPress={handleLogin}
+        containerStyle={styles.signInButton}
+        disabled={loading}
+      />
+      <Text style={styles.footerSection}>
+        Don't have account?{" "}
+        <Text style={{ color: color.primary }} onPress={goToSignUp}>
+          Register
+        </Text>
+      </Text>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  logo: {
-    fontSize: 20,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 20,
-  },
   container: {
     flex: 1,
+    backgroundColor: color.white,
     paddingVertical: 20,
     paddingHorizontal: 20,
     justifyContent: "center",
   },
   input: {
     marginVertical: 10,
-    borderWidth: 1,
-    padding: 10,
-    borderRadius: 8,
   },
-  actionButton: {
-    gap: 10,
-    marginVertical: 10,
+  signInButton: {
+    marginVertical: 20,
   },
+  footerSection: { marginVertical: 20, textAlign: "center" },
 });

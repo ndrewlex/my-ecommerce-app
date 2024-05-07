@@ -2,6 +2,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { APP_SCREENS } from "../constants/screens";
 import { CartProvider } from "../contexts/CartContext";
+import { color } from "../styles/color";
 import CartScreen from "./CartScreen";
 import CheckoutScreen from "./CheckoutScreen";
 import HomeScreen from "./HomeScreen";
@@ -13,7 +14,14 @@ const Stack = createNativeStackNavigator();
 
 function AuthTab() {
   return (
-    <Tab.Navigator>
+    <Tab.Navigator
+      sceneContainerStyle={{
+        backgroundColor: color.white,
+      }}
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
       <Tab.Screen
         name={APP_SCREENS.HOME}
         component={HomeScreen}

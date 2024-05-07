@@ -16,7 +16,7 @@ export const CartContext = createContext({
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
   const addCartItem = (product) => {
-    const { id, title, price = "" } = product || {};
+    const { id, title, image, price = "" } = product || {};
     const cartItem = cart.find((item) => item.id === product.id) || {};
 
     if (cartItem.id) {
@@ -26,7 +26,7 @@ export const CartProvider = ({ children }) => {
         )
       );
     } else {
-      setCart((curr) => [...curr, { id, title, price, quantity: 1 }]);
+      setCart((curr) => [...curr, { id, title, price, quantity: 1, image }]);
     }
   };
 

@@ -1,5 +1,6 @@
 import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { color } from "../styles/color";
 
 const ProductCard = ({ item, handleProductClick }) => {
   return (
@@ -9,13 +10,14 @@ const ProductCard = ({ item, handleProductClick }) => {
         handleProductClick(item);
       }}
     >
-      <Image source={{ uri: item.image }} style={styles.coverImage} />
-      <View style={styles.contentContainer}>
-        <Text style={styles.title}>{item.title}</Text>
-        <Text style={styles.price}>${item.price}</Text>
+      <View style={styles.imageContainer}>
+        <Image source={{ uri: item.image }} style={styles.image} />
       </View>
-      <View style={styles.likeContainer}>
-        <Text>{item.count}</Text>
+      <View style={styles.contentContainer}>
+        <Text style={styles.title} numberOfLines={4} ellipsizeMode="tail">
+          {item.title}
+        </Text>
+        <Text style={styles.price}>${item.price}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -26,27 +28,38 @@ export default ProductCard;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginHorizontal: 10,
-    marginVertical: 10,
+    margin: 5,
     backgroundColor: "white",
-    borderRadius: 20,
+    borderRadius: 5,
+    aspectRatio: 165 / 282,
+    borderWidth: 1,
+    borderColor: color.border,
   },
-  coverImage: {
-    height: 256,
+
+  imageContainer: {
+    borderRadius: 5,
+    padding: 10,
+    flex: 1,
+  },
+  image: {
+    objectFit: "contain",
+    borderRadius: 5,
     width: "100%",
-    borderRadius: 20,
-    position: "relative",
+    height: "100%",
   },
   contentContainer: {
+    borderTopColor: color.border,
+    borderTopWidth: 1,
     padding: 10,
+    height: 125,
   },
   title: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#444444",
+    fontSize: 16,
+    fontWeight: "bold",
+    color: color.primaryText,
   },
   price: {
-    fontSize: 18,
+    fontSize: 16,
   },
   likeContainer: {
     position: "absolute",
