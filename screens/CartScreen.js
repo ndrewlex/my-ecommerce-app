@@ -25,49 +25,58 @@ export default function CartScreen() {
     navigation.navigate(APP_SCREENS.THANK_YOU);
   };
 
+  const goBackHome = () => navigation.navigate(APP_SCREENS.HOME);
+
   return (
     <SafeAreaView style={styles.container}>
       <HeaderNav title="Cart" />
 
       <View style={styles.cartList}>
-        <FlatList
-          data={cart}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => {
-            return (
-              <View style={styles.cartRow} key={item.id}>
-                <View style={styles.cartColImage}>
-                  <Image
-                    source={{ uri: item.image }}
-                    style={styles.productImage}
-                  />
-                </View>
-
-                <View style={styles.cartColInfo}>
-                  <Text
-                    style={styles.productTitle}
-                    numberOfLines={4}
-                    ellipsizeMode="tail"
-                  >
-                    {item.title}
-                  </Text>
-                  <View
-                    style={{
-                      maxWidth: 150,
-                    }}
-                  >
-                    <CartQuantity
-                      size="sm"
-                      onAddCart={addCartItem}
-                      onDeleteCart={deleteCartItem}
-                      product={item}
+        {cart.length === 0 ? (
+          <View style={styles.cartListEmpty}>
+            <Text style={styles.cartListEmptyText}>Cart is empty</Text>
+            <Button onPress={goBackHome} title="Go shopping"></Button>
+          </View>
+        ) : (
+          <FlatList
+            data={cart}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => {
+              return (
+                <View style={styles.cartRow} key={item.id}>
+                  <View style={styles.cartColImage}>
+                    <Image
+                      source={{ uri: item.image }}
+                      style={styles.productImage}
                     />
                   </View>
+
+                  <View style={styles.cartColInfo}>
+                    <Text
+                      style={styles.productTitle}
+                      numberOfLines={4}
+                      ellipsizeMode="tail"
+                    >
+                      {item.title}
+                    </Text>
+                    <View
+                      style={{
+                        maxWidth: 150,
+                      }}
+                    >
+                      <CartQuantity
+                        size="sm"
+                        onAddCart={addCartItem}
+                        onDeleteCart={deleteCartItem}
+                        product={item}
+                      />
+                    </View>
+                  </View>
                 </View>
-              </View>
-            );
-          }}
-        />
+              );
+            }}
+          />
+        )}
       </View>
 
       {cart.length > 0 && (
@@ -96,6 +105,15 @@ const styles = StyleSheet.create({
   cartList: {
     height: Dimensions.get("screen").height * 0.63,
     marginVertical: 10,
+  },
+  cartListEmpty: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 20,
+  },
+  cartListEmptyText: {
+    fontSize: 18,
   },
   cartSeparator: {
     height: 1,
