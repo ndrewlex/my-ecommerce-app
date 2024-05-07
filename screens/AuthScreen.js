@@ -5,10 +5,10 @@ import { APP_SCREENS } from "../constants/screens";
 import { CartProvider } from "../contexts/CartContext";
 import { color } from "../styles/color";
 import CartScreen from "./CartScreen";
-import CheckoutScreen from "./CheckoutScreen";
 import HomeScreen from "./HomeScreen";
 import ProductDetailsScreen from "./ProductDetailsScreen";
 import ProfileScreen from "./ProfileScreen";
+import ThankyouScreen from "./ThankYouScreen";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -88,7 +88,7 @@ export default function AuthScreen() {
             tabBarLabel: "Home",
           }}
         />
-        <Stack.Screen name={APP_SCREENS.CHECKOUT} component={CheckoutScreen} />
+        <Stack.Screen name={APP_SCREENS.THANK_YOU} component={ThankyouScreen} />
         <Stack.Screen
           name={APP_SCREENS.PRODUCT_DETAILS}
           component={ProductDetailsScreen}

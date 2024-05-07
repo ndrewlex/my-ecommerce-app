@@ -4,6 +4,7 @@ export const CartContext = createContext({
   cart: [],
   addCartItem: () => {},
   deleteCartItem: () => {},
+  resetCart: () => {},
   subtotal: 0,
 });
 
@@ -55,6 +56,10 @@ export const CartProvider = ({ children }) => {
     [cart]
   );
 
+  const resetCart = () => {
+    setCart([]);
+  };
+
   return (
     <CartContext.Provider
       value={{
@@ -62,6 +67,7 @@ export const CartProvider = ({ children }) => {
         subtotal,
         addCartItem,
         deleteCartItem,
+        resetCart,
       }}
     >
       {children}

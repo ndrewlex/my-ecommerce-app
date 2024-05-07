@@ -20,8 +20,9 @@ export default function CartScreen() {
   const navigation = useNavigation();
   const { subtotal, cart, addCartItem, deleteCartItem } =
     useContext(CartContext);
+
   const handleCheckout = () => {
-    navigation.navigate(APP_SCREENS.CHECKOUT);
+    navigation.navigate(APP_SCREENS.THANK_YOU);
   };
 
   return (
