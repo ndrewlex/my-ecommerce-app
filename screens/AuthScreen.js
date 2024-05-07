@@ -1,3 +1,4 @@
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { APP_SCREENS } from "../constants/screens";
@@ -27,6 +28,14 @@ function AuthTab() {
         component={HomeScreen}
         options={{
           tabBarLabel: "Home",
+          tabBarActiveTintColor: color.primary,
+          tabBarIcon: ({ focused }) => (
+            <Ionicons
+              name="home"
+              size={24}
+              color={focused ? color.primary : color.black}
+            />
+          ),
         }}
       />
       <Tab.Screen
@@ -34,6 +43,14 @@ function AuthTab() {
         component={CartScreen}
         options={{
           tabBarLabel: "Cart",
+          tabBarActiveTintColor: color.primary,
+          tabBarIcon: ({ focused }) => (
+            <Ionicons
+              name="cart"
+              size={24}
+              color={focused ? color.primary : color.black}
+            />
+          ),
         }}
       />
       <Tab.Screen
@@ -41,6 +58,14 @@ function AuthTab() {
         component={ProfileScreen}
         options={{
           tabBarLabel: "Profile",
+          tabBarActiveTintColor: color.primary,
+          tabBarIcon: ({ focused }) => (
+            <Ionicons
+              name="person"
+              size={24}
+              color={focused ? color.primary : color.black}
+            />
+          ),
         }}
       />
     </Tab.Navigator>

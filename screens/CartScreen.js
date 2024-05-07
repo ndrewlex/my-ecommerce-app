@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Button from "../components/Button";
+import CartQuantity from "../components/CartQuantity";
 import HeaderNav from "../components/HeaderNav";
 import { APP_SCREENS } from "../constants/screens";
 import { CartContext } from "../contexts/CartContext";
@@ -17,7 +18,8 @@ import { color } from "../styles/color";
 
 export default function CartScreen() {
   const navigation = useNavigation();
-  const { subtotal, cart } = useContext(CartContext);
+  const { subtotal, cart, addCartItem, deleteCartItem } =
+    useContext(CartContext);
   const handleCheckout = () => {
     navigation.navigate(APP_SCREENS.CHECKOUT);
   };
@@ -41,12 +43,25 @@ export default function CartScreen() {
                 </View>
 
                 <View style={styles.cartColInfo}>
-                  <Text style={styles.productTitle}>
-                    <Text className={styles.productQuantity}>
-                      {item.quantity}
-                    </Text>{" "}
-                    x {item.title}
+                  <Text
+                    style={styles.productTitle}
+                    numberOfLines={4}
+                    ellipsizeMode="tail"
+                  >
+                    {item.title}
                   </Text>
+                  <View
+                    style={{
+                      maxWidth: 150,
+                    }}
+                  >
+                    <CartQuantity
+                      size="sm"
+                      onAddCart={addCartItem}
+                      onDeleteCart={deleteCartItem}
+                      product={item}
+                    />
+                  </View>
                 </View>
               </View>
             );
@@ -54,19 +69,21 @@ export default function CartScreen() {
         />
       </View>
 
-      <View style={styles.cartFooter}>
-        <View style={styles.subtotal}>
-          <Text style={styles.subtotalText}>Subtotal</Text>
-          <Text>$ {subtotal}</Text>
+      {cart.length > 0 && (
+        <View style={styles.cartFooter}>
+          <View style={styles.subtotal}>
+            <Text style={styles.subtotalText}>Subtotal</Text>
+            <Text>$ {subtotal}</Text>
+          </View>
+          <Button
+            title="Checkout"
+            onPress={handleCheckout}
+            containerStyle={{ flex: 1 }}
+          >
+            Checkout
+          </Button>
         </View>
-        <Button
-          title="Checkout"
-          onPress={handleCheckout}
-          containerStyle={{ flex: 1 }}
-        >
-          Checkout
-        </Button>
-      </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -115,6 +132,8 @@ const styles = StyleSheet.create({
 
   productTitle: {
     fontSize: 16,
+    flex: 1,
+    marginBottom: 10,
   },
 
   productQuantity: {

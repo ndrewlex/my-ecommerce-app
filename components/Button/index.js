@@ -14,31 +14,62 @@ export default function Button({
   size = "md",
   styles = {},
   containerStyle = {},
+  children,
   ...props
 }) {
   return (
     <View style={containerStyle}>
       <TouchableOpacity
-        style={[defaultStyles[`${size}Button`], styles]}
+        style={[defaultStyles.base, defaultStyles[`${size}`], styles]}
         {...props}
       >
-        <Text style={[defaultStyles[`${size}ButtonText`]]}>{title}</Text>
+        {title ? (
+          <Text
+            style={[defaultStyles.baseContent, defaultStyles[`${size}Button`]]}
+          >
+            {title}
+          </Text>
+        ) : (
+          <View
+            style={[defaultStyles.baseContent, defaultStyles[`${size}Button`]]}
+          >
+            {children}
+          </View>
+        )}
       </TouchableOpacity>
     </View>
   );
 }
 
 const defaultStyles = StyleSheet.create({
-  mdButton: {
-    padding: 16,
-    height: 57,
+  base: {
     backgroundColor: color.primary,
     borderRadius: 5,
+    justifyContent: "center",
+    alignItems: "center",
   },
-  mdButtonText: {
-    textAlign: "center",
-    fontSize: 15,
+
+  baseContent: {
     color: color.white,
+    textAlign: "center",
     fontWeight: 600,
+  },
+
+  md: {
+    height: 57,
+    padding: 16,
+  },
+
+  mdButton: {
+    fontSize: 15,
+  },
+
+  sm: {
+    padding: 8,
+    height: 32,
+  },
+
+  smButton: {
+    fontSize: 12,
   },
 });

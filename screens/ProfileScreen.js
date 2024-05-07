@@ -1,3 +1,4 @@
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
 import { useContext } from "react";
 import { StyleSheet, Text, View } from "react-native";
@@ -21,12 +22,15 @@ export default function ProfileScreen() {
     <SafeAreaView style={styles.container}>
       <HeaderNav title="Profile" />
       <View style={styles.content}>
-        <Text>My Profile</Text>
-        <View>
-          <Text>Hi, {user.email}</Text>
+        <View style={styles.profileImage}>
+          <Ionicons name="person-circle" size={80} />
         </View>
-        <Button title="Logout" onPress={handleLogout} />
+        <View>
+          <Text>Hi, {user.firstName + " " + user.lastName}</Text>
+          <Text>{user.email}</Text>
+        </View>
       </View>
+      <Button title="Logout" onPress={handleLogout} />
     </SafeAreaView>
   );
 }
@@ -35,7 +39,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  profileImage: {
+    marginRight: 10,
+  },
   content: {
+    flexDirection: "row",
     padding: 10,
+    alignItems: "center",
   },
 });
