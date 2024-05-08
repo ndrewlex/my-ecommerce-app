@@ -1,4 +1,13 @@
-import { createContext, useMemo, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import { getCustomerById, updateCartUser } from "../services/firebase/auth";
+import { AuthContext } from "./AuthContext";
 
 export const CartContext = createContext({
   cart: [],
@@ -8,57 +17,91 @@ export const CartContext = createContext({
   subtotal: 0,
 });
 
-/* Cart item data
-    - title
-    - quantity
-    - price
-*/
+export const convertProductToCart = (product) => {
+  return {
+    itemId: product?.id ?? null,
+    itemTitle: product.title,
+    itemPrice: Number(product.price || 0),
+    itemImage: product.image,
+  };
+};
 
 export const CartProvider = ({ children }) => {
+  const { user } = useContext(AuthContext);
   const [cart, setCart] = useState([]);
-  const addCartItem = (product) => {
-    const { id, title, image, price = "" } = product || {};
-    const cartItem = cart.find((item) => item.id === product.id) || {};
 
-    if (cartItem.id) {
-      setCart((curr) =>
-        curr.map((item) =>
-          item.id === id ? { ...item, quantity: item.quantity + 1 } : item
-        )
-      );
-    } else {
-      setCart((curr) => [...curr, { id, title, price, quantity: 1, image }]);
+  const fetchUserData = useCallback(async () => {
+    if (!user.uid) return;
+    const res = await getCustomerById(user.uid);
+    if (res.isSuccess && res.data) {
+      const { cart } = res.data;
+      setCart(cart);
     }
-  };
+  }, [user.uid]);
 
-  const deleteCartItem = (product) => {
-    const { id, quantity } = cart.find((item) => item.id === product.id) || {};
+  useEffect(() => {
+    fetchUserData();
+  }, [user.uid, fetchUserData]);
 
-    if (!id) return;
+  const addCartItem = useCallback((product) => {
+    setCart((curr) => {
+      const cartItem = curr.find((curr) => curr.itemId === product.itemId);
+      const newCart = cartItem
+        ? curr.map((row) =>
+            row.itemId === product.itemId
+              ? Object.assign(row, { quantity: row.quantity + 1 })
+              : row
+          )
+        : [
+            ...curr,
+            {
+              ...product,
+              price: product.itemPrice,
+              quantity: 1,
+            },
+          ];
+      updateCartUser({
+        uid: user.uid,
+        cart: newCart,
+      });
+      return newCart;
+    });
+  }, []);
 
-    if (quantity === 1) {
-      setCart((curr) => curr.filter((item) => item.id !== id));
-    } else {
-      setCart((curr) =>
-        curr.map((item) =>
-          item.id === id ? { ...item, quantity: item.quantity - 1 } : item
-        )
-      );
-    }
-  };
+  const deleteCartItem = useCallback((product) => {
+    setCart((curr) => {
+      const cartItem = curr.find((curr) => curr.itemId === product.itemId);
+
+      const newCart = !cartItem
+        ? curr
+        : cartItem.quantity === 1
+        ? curr.filter((row) => row.itemId !== product.itemId)
+        : curr.map((row) => {
+            const quantity = (row.quantity || 0) - 1;
+            const price = quantity * product.price;
+
+            return row.itemId === product.itemId
+              ? Object.assign(row, { quantity, price })
+              : row;
+          });
+
+      updateCartUser({
+        uid: user.uid,
+        cart: newCart,
+      });
+
+      return newCart;
+    });
+  }, []);
 
   const subtotal = useMemo(
-    () =>
-      cart.reduce((acc, curr) => {
-        const itemTotal = Number(curr.price) * Number(curr.quantity);
-        return acc + itemTotal;
-      }, 0),
+    () => cart.reduce((acc, curr) => acc + curr.price, 0),
     [cart]
   );
 
-  const resetCart = () => {
+  const resetCart = useCallback(() => {
     setCart([]);
-  };
+  }, []);
 
   return (
     <CartContext.Provider

@@ -40,13 +40,13 @@ export default function CartScreen() {
         ) : (
           <FlatList
             data={cart}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => item.itemId}
             renderItem={({ item }) => {
               return (
                 <View style={styles.cartRow} key={item.id}>
                   <View style={styles.cartColImage}>
                     <Image
-                      source={{ uri: item.image }}
+                      source={{ uri: item.itemImage }}
                       style={styles.productImage}
                     />
                   </View>
@@ -57,7 +57,7 @@ export default function CartScreen() {
                       numberOfLines={4}
                       ellipsizeMode="tail"
                     >
-                      {item.title}
+                      {item.itemTitle}
                     </Text>
                     <View
                       style={{

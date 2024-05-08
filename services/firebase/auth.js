@@ -89,4 +89,22 @@ async function getCustomerById(uid) {
   }
 }
 
-export { getCustomerById, loginUser, logoutUser, registerUser };
+async function updateCartUser({ uid, cart = [] }) {
+  try {
+    const res = await setDoc(doc(db, "customer", uid), {
+      cart,
+    });
+
+    return {
+      isSuccess: true,
+      data: res,
+    };
+  } catch (e) {
+    return {
+      isSuccess: false,
+      error: getErrorMessage(e),
+    };
+  }
+}
+
+export { getCustomerById, loginUser, logoutUser, registerUser, updateCartUser };

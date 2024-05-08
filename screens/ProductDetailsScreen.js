@@ -1,24 +1,37 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Button from "../components/Button";
 import CartQuantity from "../components/CartQuantity";
 import HeaderNav from "../components/HeaderNav";
-import { CartContext } from "../contexts/CartContext";
+import { CartContext, convertProductToCart } from "../contexts/CartContext";
+import { getProductById } from "../services/products";
 import { color } from "../styles/color";
 
 export default function ProductDetailsScreen({ route }) {
   const { addCartItem, deleteCartItem, cart } = useContext(CartContext);
-  const product = route.params.item;
+  const [product, setProduct] = useState({});
+  const productId = route.params.id;
 
-  const selectedProduct = cart.find((i) => i.id === product.id);
+  const selectedProduct = cart.find((curr) => curr.itemId === productId);
+
+  const fetchProductById = async () => {
+    const res = await getProductById(productId);
+    if (res.data) {
+      setProduct(res.data);
+    }
+  };
+
+  useEffect(() => {
+    fetchProductById(productId);
+  }, [productId]);
 
   const handleAddToCart = () => {
-    addCartItem(product);
+    addCartItem(convertProductToCart(product));
   };
 
   const handleDeleteCart = () => {
-    deleteCartItem(product);
+    deleteCartItem(convertProductToCart(product));
   };
 
   return (
