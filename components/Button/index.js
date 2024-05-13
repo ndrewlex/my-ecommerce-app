@@ -20,7 +20,12 @@ export default function Button({
   return (
     <View style={containerStyle}>
       <TouchableOpacity
-        style={[defaultStyles.base, defaultStyles[`${size}`], styles]}
+        style={[
+          defaultStyles.base,
+          defaultStyles[`${size}`],
+          props.disabled && defaultStyles.disabledButton,
+          styles,
+        ]}
         {...props}
       >
         {title ? (
@@ -47,6 +52,11 @@ const defaultStyles = StyleSheet.create({
     borderRadius: 5,
     justifyContent: "center",
     alignItems: "center",
+  },
+
+  disabledButton: {
+    backgroundColor: color.gray,
+    opacity: 0.8,
   },
 
   baseContent: {

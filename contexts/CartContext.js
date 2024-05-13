@@ -1,3 +1,4 @@
+import { useNavigation } from "@react-navigation/native";
 import {
   createContext,
   useCallback,
@@ -6,7 +7,9 @@ import {
   useMemo,
   useState,
 } from "react";
+import { APP_SCREENS } from "../constants/screens";
 import { getCustomerById, updateCartUser } from "../services/firebase/auth";
+import { addTransaction } from "../services/firebase/transactions";
 import { AuthContext } from "./AuthContext";
 
 export const CartContext = createContext({
@@ -15,6 +18,8 @@ export const CartContext = createContext({
   deleteCartItem: () => {},
   resetCart: () => {},
   subtotal: 0,
+  fetchUserData: () => {},
+  checkoutCart: () => {},
 });
 
 export const convertProductToCart = (product) => {
@@ -29,13 +34,16 @@ export const convertProductToCart = (product) => {
 export const CartProvider = ({ children }) => {
   const { user } = useContext(AuthContext);
   const [cart, setCart] = useState([]);
+  const navigation = useNavigation();
 
   const fetchUserData = useCallback(async () => {
     if (!user.uid) return;
     const res = await getCustomerById(user.uid);
     if (res.isSuccess && res.data) {
       const { cart } = res.data;
-      setCart(cart);
+      if (cart) {
+        setCart(cart);
+      }
     }
   }, [user.uid]);
 
@@ -46,12 +54,18 @@ export const CartProvider = ({ children }) => {
   const addCartItem = useCallback((product) => {
     setCart((curr) => {
       const cartItem = curr.find((curr) => curr.itemId === product.itemId);
+
       const newCart = cartItem
-        ? curr.map((row) =>
-            row.itemId === product.itemId
-              ? Object.assign(row, { quantity: row.quantity + 1 })
-              : row
-          )
+        ? curr.map((row) => {
+            const quantity = Number(row.quantity) + 1;
+
+            return row.itemId === product.itemId
+              ? Object.assign(row, {
+                  quantity,
+                  price: quantity * product.itemPrice,
+                })
+              : row;
+          })
         : [
             ...curr,
             {
@@ -72,18 +86,19 @@ export const CartProvider = ({ children }) => {
     setCart((curr) => {
       const cartItem = curr.find((curr) => curr.itemId === product.itemId);
 
-      const newCart = !cartItem
-        ? curr
-        : cartItem.quantity === 1
-        ? curr.filter((row) => row.itemId !== product.itemId)
-        : curr.map((row) => {
-            const quantity = (row.quantity || 0) - 1;
-            const price = quantity * product.price;
+      if (!cartItem) return curr;
 
-            return row.itemId === product.itemId
-              ? Object.assign(row, { quantity, price })
-              : row;
-          });
+      const newCart =
+        cartItem.quantity === 1
+          ? curr.filter((row) => row.itemId !== product.itemId)
+          : curr.map((row) => {
+              const quantity = (row.quantity || 0) - 1;
+              const price = quantity * product.itemPrice;
+
+              return row.itemId === product.itemId
+                ? Object.assign(row, { quantity, price })
+                : row;
+            });
 
       updateCartUser({
         uid: user.uid,
@@ -100,8 +115,17 @@ export const CartProvider = ({ children }) => {
   );
 
   const resetCart = useCallback(() => {
-    setCart([]);
-  }, []);
+    if (user.uid) {
+      updateCartUser({ uid: user.uid, cart: [] });
+      setCart([]);
+    }
+  }, [user.uid]);
+
+  const checkoutCart = useCallback(async () => {
+    await addTransaction(user.uid, cart, subtotal);
+    await resetCart();
+    navigation.navigate(APP_SCREENS.THANK_YOU);
+  }, [user.uid, cart, resetCart, navigation, subtotal]);
 
   return (
     <CartContext.Provider
@@ -111,6 +135,8 @@ export const CartProvider = ({ children }) => {
         addCartItem,
         deleteCartItem,
         resetCart,
+        fetchUserData,
+        checkoutCart,
       }}
     >
       {children}

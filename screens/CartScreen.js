@@ -1,9 +1,10 @@
-import { useNavigation } from "@react-navigation/native";
-import { useContext } from "react";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useCallback, useContext, useState } from "react";
 import {
   Dimensions,
   FlatList,
   Image,
+  RefreshControl,
   StyleSheet,
   Text,
   View,
@@ -16,14 +17,36 @@ import { APP_SCREENS } from "../constants/screens";
 import { CartContext } from "../contexts/CartContext";
 import { color } from "../styles/color";
 
+const SCREEN_HEIGHT = Dimensions.get("screen").height;
+
 export default function CartScreen() {
   const navigation = useNavigation();
-  const { subtotal, cart, addCartItem, deleteCartItem } =
-    useContext(CartContext);
+  const {
+    subtotal,
+    cart,
+    addCartItem,
+    deleteCartItem,
+    fetchUserData,
+    checkoutCart,
+  } = useContext(CartContext);
 
-  const handleCheckout = () => {
-    navigation.navigate(APP_SCREENS.THANK_YOU);
-  };
+  const [refreshing, setRefreshing] = useState(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      // Do something when the screen is focused
+      fetchUserData();
+      return () => {};
+    }, [])
+  );
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchUserData();
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  }, [fetchUserData]);
 
   const goBackHome = () => navigation.navigate(APP_SCREENS.HOME);
 
@@ -32,51 +55,54 @@ export default function CartScreen() {
       <HeaderNav title="Cart" />
 
       <View style={styles.cartList}>
-        {cart.length === 0 ? (
-          <View style={styles.cartListEmpty}>
-            <Text style={styles.cartListEmptyText}>Cart is empty</Text>
-            <Button onPress={goBackHome} title="Go shopping"></Button>
-          </View>
-        ) : (
-          <FlatList
-            data={cart}
-            keyExtractor={(item) => item.itemId}
-            renderItem={({ item }) => {
-              return (
-                <View style={styles.cartRow} key={item.id}>
-                  <View style={styles.cartColImage}>
-                    <Image
-                      source={{ uri: item.itemImage }}
-                      style={styles.productImage}
+        <FlatList
+          data={cart}
+          contentContainerStyle={cart.length === 0 && styles.cartListEmpty}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          keyExtractor={(item) => item.itemId}
+          ListEmptyComponent={() => (
+            <View style={styles.cartListEmpty}>
+              <Text style={styles.cartListEmptyText}>Cart is empty</Text>
+              <Button onPress={goBackHome} title="Go shopping"></Button>
+            </View>
+          )}
+          renderItem={({ item }) => {
+            return (
+              <View style={styles.cartRow} key={item.id}>
+                <View style={styles.cartColImage}>
+                  <Image
+                    source={{ uri: item.itemImage }}
+                    style={styles.productImage}
+                  />
+                </View>
+
+                <View style={styles.cartColInfo}>
+                  <Text
+                    style={styles.productTitle}
+                    numberOfLines={4}
+                    ellipsizeMode="tail"
+                  >
+                    {item.itemTitle}
+                  </Text>
+                  <View
+                    style={{
+                      maxWidth: 150,
+                    }}
+                  >
+                    <CartQuantity
+                      size="sm"
+                      onAddCart={addCartItem}
+                      onDeleteCart={deleteCartItem}
+                      product={item}
                     />
                   </View>
-
-                  <View style={styles.cartColInfo}>
-                    <Text
-                      style={styles.productTitle}
-                      numberOfLines={4}
-                      ellipsizeMode="tail"
-                    >
-                      {item.itemTitle}
-                    </Text>
-                    <View
-                      style={{
-                        maxWidth: 150,
-                      }}
-                    >
-                      <CartQuantity
-                        size="sm"
-                        onAddCart={addCartItem}
-                        onDeleteCart={deleteCartItem}
-                        product={item}
-                      />
-                    </View>
-                  </View>
                 </View>
-              );
-            }}
-          />
-        )}
+              </View>
+            );
+          }}
+        />
       </View>
 
       {cart.length > 0 && (
@@ -87,7 +113,7 @@ export default function CartScreen() {
           </View>
           <Button
             title="Checkout"
-            onPress={handleCheckout}
+            onPress={checkoutCart}
             containerStyle={{ flex: 1 }}
           >
             Checkout
@@ -103,11 +129,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   cartList: {
-    height: Dimensions.get("screen").height * 0.63,
+    height: SCREEN_HEIGHT * 0.63,
     marginVertical: 10,
   },
   cartListEmpty: {
     flex: 1,
+    flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
     gap: 20,

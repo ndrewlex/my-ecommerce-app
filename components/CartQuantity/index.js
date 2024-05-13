@@ -23,6 +23,7 @@ export default function CartQuantity({
   product,
   onAddCart,
   onDeleteCart,
+  disabled = false,
 }) {
   const handleAddCart = () => {
     onAddCart(product);
@@ -38,6 +39,7 @@ export default function CartQuantity({
       <Button
         size={size}
         onPress={handleDeleteCart}
+        disabled={disabled}
         containerStyle={styles.buttonContainer}
         styles={[styles.button, styles.minusButton]}
       >
@@ -47,6 +49,7 @@ export default function CartQuantity({
       <Button
         size={size}
         onPress={handleAddCart}
+        disabled={disabled}
         containerStyle={styles.buttonContainer}
         styles={[styles.button, styles.addButton]}
       >
