@@ -20,7 +20,7 @@ export default function HomeScreen() {
   }, []);
 
   const handleProductDetails = (item) => {
-    navigation.navigate(APP_SCREENS.PRODUCT_DETAILS, { item });
+    navigation.navigate(APP_SCREENS.PRODUCT_DETAILS, { id: item.id });
   };
 
   return (

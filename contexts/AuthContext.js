@@ -33,6 +33,7 @@ export const AuthProvider = ({ children }) => {
         const currentUser = JSON.parse(data);
         setUser(currentUser);
       }
+
       setInitialized(false);
     };
 

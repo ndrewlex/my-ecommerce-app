@@ -6,6 +6,7 @@ import { CartProvider } from "../contexts/CartContext";
 import { color } from "../styles/color";
 import CartScreen from "./CartScreen";
 import HomeScreen from "./HomeScreen";
+import OrderScreen from "./OrderScreen";
 import ProductDetailsScreen from "./ProductDetailsScreen";
 import ProfileScreen from "./ProfileScreen";
 import ThankyouScreen from "./ThankYouScreen";
@@ -47,6 +48,21 @@ function AuthTab() {
           tabBarIcon: ({ focused }) => (
             <Ionicons
               name="cart"
+              size={24}
+              color={focused ? color.primary : color.black}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name={APP_SCREENS.ORDERS}
+        component={OrderScreen}
+        options={{
+          tabBarLabel: "Orders",
+          tabBarActiveTintColor: color.primary,
+          tabBarIcon: ({ focused }) => (
+            <Ionicons
+              name="document-text"
               size={24}
               color={focused ? color.primary : color.black}
             />

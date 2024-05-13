@@ -13,13 +13,13 @@ export default function ThankyouScreen() {
 
   const goBackHome = () => {
     resetCart();
-    navigation.navigate(APP_SCREENS.HOME);
+    navigation.navigate(APP_SCREENS.ORDERS);
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.text}>Thank you, we will process your order</Text>
-      <Button onPress={goBackHome} title="Back to home"></Button>
+      <Text style={styles.text}>Thank you for your order</Text>
+      <Button onPress={goBackHome} title="Back to order"></Button>
     </SafeAreaView>
   );
 }

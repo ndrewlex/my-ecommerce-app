@@ -1,6 +1,7 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useContext } from "react";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { APP_SCREENS } from "./constants/screens";
 import { AuthContext, AuthProvider } from "./contexts/AuthContext";
 import AuthScreen from "./screens/AuthScreen";
@@ -11,7 +12,16 @@ import { color } from "./styles/color";
 const Stack = createNativeStackNavigator();
 
 function AppRouter() {
-  const { user } = useContext(AuthContext);
+  const { user, initialized } = useContext(AuthContext);
+
+  if (initialized) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color={color.primary} />
+      </View>
+    );
+  }
+
   return (
     <NavigationContainer>
       {!user.isAuth ? (
@@ -57,3 +67,10 @@ export default function App() {
     </AuthProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+  },
+});

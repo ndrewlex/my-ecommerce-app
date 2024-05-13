@@ -30,7 +30,11 @@ export default function ProfileScreen() {
           <Text>{user.email}</Text>
         </View>
       </View>
-      <Button title="Logout" onPress={handleLogout} />
+      <Button
+        title="Logout"
+        onPress={handleLogout}
+        containerStyle={styles.btnContainer}
+      />
     </SafeAreaView>
   );
 }
@@ -46,5 +50,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     padding: 10,
     alignItems: "center",
+  },
+  btnContainer: {
+    marginHorizontal: 15,
   },
 });

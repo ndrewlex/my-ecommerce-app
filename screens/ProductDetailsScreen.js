@@ -1,40 +1,76 @@
-import React, { useContext } from "react";
-import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
+import React, { useCallback, useContext, useEffect, useState } from "react";
+import {
+  Image,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Button from "../components/Button";
 import CartQuantity from "../components/CartQuantity";
 import HeaderNav from "../components/HeaderNav";
-import { CartContext } from "../contexts/CartContext";
+import { CartContext, convertProductToCart } from "../contexts/CartContext";
+import { getProductById } from "../services/products";
 import { color } from "../styles/color";
 
 export default function ProductDetailsScreen({ route }) {
   const { addCartItem, deleteCartItem, cart } = useContext(CartContext);
-  const product = route.params.item;
+  const [product, setProduct] = useState();
+  const productId = route.params.id;
 
-  const selectedProduct = cart.find((i) => i.id === product.id);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const selectedProduct = cart.find((curr) => curr.itemId === productId);
+
+  const fetchProductById = async () => {
+    const res = await getProductById(productId);
+    if (res.data) {
+      setProduct(res.data);
+    }
+  };
+
+  useEffect(() => {
+    fetchProductById(productId);
+  }, [productId]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchProductById(productId);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  }, [productId]);
 
   const handleAddToCart = () => {
-    addCartItem(product);
+    if (product) {
+      addCartItem(convertProductToCart(product));
+    }
   };
 
   const handleDeleteCart = () => {
-    deleteCartItem(product);
+    deleteCartItem(convertProductToCart(product));
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <HeaderNav withBorder={false} />
-      <ScrollView>
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         <View style={styles.imageContainer}>
-          <Image source={{ uri: product.image }} style={styles.image} />
+          <Image source={{ uri: product?.image }} style={styles.image} />
         </View>
 
         <View style={styles.contentContainer}>
-          <Text style={styles.priceText}>${product.price}</Text>
-          <Text style={styles.titleText}>{product.title}</Text>
+          <Text style={styles.priceText}>${product?.price}</Text>
+          <Text style={styles.titleText}>{product?.title}</Text>
 
           <Text style={styles.titleDesc}>Description</Text>
-          <Text stlye={styles.textDesc}>{product.description}</Text>
+          <Text stlye={styles.textDesc}>{product?.description}</Text>
         </View>
       </ScrollView>
       <View style={{ padding: 10 }}>
@@ -43,9 +79,14 @@ export default function ProductDetailsScreen({ route }) {
             product={selectedProduct}
             onAddCart={handleAddToCart}
             onDeleteCart={handleDeleteCart}
+            disabled={refreshing || !product?.price}
           />
         ) : (
-          <Button title="Add to cart" onPress={handleAddToCart} />
+          <Button
+            title="Add to cart"
+            onPress={handleAddToCart}
+            disabled={refreshing || !product?.price}
+          />
         )}
       </View>
     </SafeAreaView>

@@ -4,7 +4,7 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from "firebase/auth";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { getErrorMessage } from "./errorMessage";
 import { db } from "./firestore";
 import { firebaseApp } from "./initFirebase";
@@ -89,4 +89,22 @@ async function getCustomerById(uid) {
   }
 }
 
-export { getCustomerById, loginUser, logoutUser, registerUser };
+async function updateCartUser({ uid, cart = [] }) {
+  try {
+    const res = await updateDoc(doc(db, "customer", uid), {
+      cart,
+    });
+
+    return {
+      isSuccess: true,
+      data: res,
+    };
+  } catch (e) {
+    return {
+      isSuccess: false,
+      error: getErrorMessage(e),
+    };
+  }
+}
+
+export { getCustomerById, loginUser, logoutUser, registerUser, updateCartUser };
